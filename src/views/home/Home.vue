@@ -7,12 +7,13 @@
       </div>
     </NavBar>
     <swiper>
-      <swiper-item v-for="item in banners" >
-     <a :href="item.link">
-       <img :src="item.image" alt="">
-     </a>
+      <swiper-item v-for="item in banners">
+        <a :href="item.link">
+          <img :src="item.image" alt="">
+        </a>
       </swiper-item>
     </swiper>
+    <recommend-view :recommends="recommends"></recommend-view>
   </div>
 </template>
 
@@ -22,11 +23,13 @@ import NavBar from "@/components/common/navvar/NavBar";
 import {getHomeMultidata} from "@/network/home";
 
 import {Swiper, SwiperItem} from "@/components/common/swiper";
+import RecommendView from "./childComps/RecommendView";
 
 
 export default {
   name: "Home",
   components: {
+    RecommendView,
     Swiper,
     SwiperItem,
     NavBar
