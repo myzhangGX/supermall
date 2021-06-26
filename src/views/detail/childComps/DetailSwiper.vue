@@ -7,28 +7,29 @@
 </template>
 
 <script>
-  import {Swiper, SwiperItem} from 'components/common/swiper'
+import {Swiper, SwiperItem} from 'components/common/swiper'
 
-  export default {
-    name: "DetailSwiper",
-    components: {
-      Swiper,
-      SwiperItem
-    },
-    props: {
-      topImages: {
-        type: Array,
-        default() {
-          return []
-        }
+export default {
+  name: "DetailSwiper",
+  components: {
+    Swiper,
+    SwiperItem
+  },
+  props: {
+    topImages: {
+      type: Array,
+      default() {
+        return []
       }
     }
   }
+}
 </script>
 
 <style scoped>
-  .detail-swiper {
-    height: 300px;
-    overflow: hidden;
-  }
+.detail-swiper {
+  height: 300px;
+  /*隐藏超出的内容*/
+  overflow: hidden;
+}
 </style>

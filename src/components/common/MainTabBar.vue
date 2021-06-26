@@ -1,5 +1,6 @@
 <template>
   <tab-bar>
+    <!--  <tab-bar-item path="/home" activeColor="yellow"> 设置activeColor 自定义颜色 -->
     <tab-bar-item path="/home">
       <img slot="item-icon" alt="" src="~assets/img/tabbar/home.svg">
       <img slot="item-icon-active" alt="" src="~assets/img/tabbar/home_active.svg">
@@ -24,14 +25,13 @@
 </template>
 
 <script>
-import TabBar from 'components/common/tabbar/TabBar'
-import TabBarItem from 'components/common/tabbar/TabBarItem'
+import TabBar from "components/common/tabbar/TabBar"
+import TabBarItem from "components/common/tabbar/TabBarItem"
 
 export default {
   name: "MainTabBar",
   components: {
-    TabBar,
-    TabBarItem
+    TabBar, TabBarItem
   }
 }
 </script>
