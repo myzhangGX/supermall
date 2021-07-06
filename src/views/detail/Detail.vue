@@ -5,6 +5,8 @@
     <derail-nav-bar/>
     <!--    传送轮播图片数据数据-->
     <detail-swiper :top-images="topImages"/>
+    <!--    商品信息-->
+    <detail-base-info :goods="goods"/>
   </div>
 </template>
 
@@ -12,20 +14,24 @@
 
 
 import DerailNavBar from "./childComps/DerailNavBar";
-
-import {getDetail} from "network/detail";
 import DetailSwiper from "./childComps/DetailSwiper";
+import DetailBaseInfo from "@/views/detail/childComps/DetailBaseInfo";
+
+import {getDetail, Goods} from "network/detail";
 
 export default {
   name: "Detail",
   components: {
+    DetailBaseInfo,
     DetailSwiper,
     DerailNavBar
   },
   data() {
     return {
       iid: null,
-      topImages: []
+      topImages: [],
+      //  商品信息\
+      goods: {}
     }
   },
   created() {
@@ -33,9 +39,13 @@ export default {
     this.iid = this.$route.params.iid
     //2.根据iid请求详情数据
     getDetail(this.iid).then(res => {
-      // 1.获取顶部的图片轮播数据
-      console.log(res);
+      //1获取轮播数据
+      const data = res.result;
+      // 2.获取顶部的图片轮播数据
       this.topImages = res.result.itemInfo.topImages
+      //3创建商品的对象
+      // 2.获取商品信息
+      this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services)
     })
 
   }
