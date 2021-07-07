@@ -75,7 +75,7 @@ export default {
 
   /*让元素上浮一些: 使用相对定位即可*/
   position: relative;
-  top: -8px;
+  top: -1px;
 }
 
 .info-other {

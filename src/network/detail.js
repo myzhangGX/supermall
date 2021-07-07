@@ -57,7 +57,7 @@ export class GoodsParam {
 //   constructor()
 // }
 
-//类似Java构造器
+//类似Java构造器ES6的使用方法
 // class Person {
 //   constructor(name, age) {
 //     this.name = name;

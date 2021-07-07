@@ -7,6 +7,8 @@
     <detail-swiper :top-images="topImages"/>
     <!--    商品信息-->
     <detail-base-info :goods="goods"/>
+    <!--    商家基本信息-->
+    <detail-shop-info :shop="shop"/>
   </div>
 </template>
 
@@ -17,11 +19,13 @@ import DerailNavBar from "./childComps/DerailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import DetailBaseInfo from "@/views/detail/childComps/DetailBaseInfo";
 
-import {getDetail, Goods} from "network/detail";
+import {getDetail, Goods, Shop} from "network/detail";//导入获取到要展示的数据
+import DetailShopInfo from "@/views/detail/childComps/DetailShopInfo";
 
 export default {
   name: "Detail",
   components: {
+    DetailShopInfo,
     DetailBaseInfo,
     DetailSwiper,
     DerailNavBar
@@ -31,7 +35,9 @@ export default {
       iid: null,
       topImages: [],
       //  商品信息\
-      goods: {}
+      goods: {},
+      //  商家信息
+      shop: {}
     }
   },
   created() {
@@ -46,6 +52,8 @@ export default {
       //3创建商品的对象
       // 2.获取商品信息
       this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services)
+      //    取出商家的基本信息
+      this.shop = new Shop(data.shopInfo)
     })
 
   }
