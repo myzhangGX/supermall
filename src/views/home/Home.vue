@@ -1,45 +1,45 @@
 <template>
   <div id="home" class="wrapper">
-    <nav-bar class="home-nav">
-      <div slot="center">购物街</div>
-    </nav-bar>
-    <tab-control v-show="isTabFixed"
+    <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-control :titles="['流行', '新款', '精选']"
+                 @tabClick="tabClick"
                  ref="tabControl1"
-                 :titles="['流行', '新款', '精选']"
-                 class="tab-control" @tabClick="tabClick"/>
-    <scroll ref="scroll"
+                 class="tab-control" v-show="isTabFixed"/>
+    <scroll class="content"
+            ref="scroll"
             :probe-type="3"
+            @scroll="contentScroll"
             :pull-up-load="true"
-            class="content"
-            @pullingUp="loadMore"
-            @scroll="contentScroll">
+            @pullingUp="loadMore">
       <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control ref="tabControl2"
-                   :titles="['流行', '新款', '精选']"
-                   @tabClick="tabClick"/>
-      <good-list :goods="showGoods"/>
+      <tab-control :titles="['流行', '新款', '精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl2" />
+      <goods-list :goods="showGoods"/>
     </scroll>
-    <back-top v-show="isShowBackTop" @click.native="backClick"/>
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
 <script>
-import  HomeSwiper from './childComps/HomeSwiper'
-import RecommendView from './childComps/RecommendView'
-import FeatureView from './childComps/FeatureView'
+  /*组件私有*/
+  import HomeSwiper from "./childComps/HomeSwiper"; //轮播图
+  import RecommendView from "./childComps/RecommendView"; //推荐
+  import FeatureView from "./childComps/FeatureView"; //本周流行
 
-import NavBar from 'components/common/navbar/NavBar'
-import TabControl from 'components/content/tabControl/TabControl'
-import GoodList from 'components/content/goods/GoodsList'
-import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backTop/BackTop'
+  /*公共组件*/
+  import NavBar from "@/components/common/navbar/NavBar"; //导航栏，屏幕最下方4大组件
+  import TabControl from "@/components/content/tabControl/TabControl"; // 切换商品
+  import GoodsList from "@/components/content/goods/GoodsList"; //商品展示
+  import Scroll from "@/components/common/scroll/Scroll"; //滚动
+  import BackTop from "@/components/content/backTop/BackTop"; //返回顶部图片
+  /*数据*/
+  import {getHomeMuleidata, getHomeGoods} from "@/network/home";  //网络请求
+  import {itemListenerMixin, backTopMixin} from "@/common/mixin"; //混入
 
-import {getHomeMultidata, getHomeGoods} from "network/home"
-import {debounce} from "common/utils";
-
-export default {
+  export default {
   name: "Home",
   components: {
     HomeSwiper,
@@ -47,63 +47,62 @@ export default {
     FeatureView,
     NavBar,
     TabControl,
-    GoodList,
+    GoodsList,
     Scroll,
     BackTop
   },
+  mixins:[itemListenerMixin, backTopMixin],
   data() {
-    return {
-      banners: [],
-      recommends: [],
-      goods: {
-        'pop': {page: 0, list: []},
-        'new': {page: 0, list: []},
-        'sell': {page: 0, list: []},
-      },
-      currentType: 'pop',
-      isShowBackTop: false,
-      tabOffsetTop: 0,
-      isTabFixed: false,
-      saveY: 0
-    }
+     return {
+       banners: [],
+       recommends: [],
+       goods: {
+         'pop': {page: 0, list: []},
+         'new': {page: 0, list: []},
+         'sell': {page: 0, list: []},
+       },
+       currentType: 'pop',
+       tabOffsetTop: 0,//保存变量切换类型高度
+       isTabFixed: false,//决定是否显示切换类型
+       saveY: 0, //保存变量--》页面位置
+     }
   },
   computed: {
     showGoods() {
       return this.goods[this.currentType].list
     }
   },
-  destroyed() {
-    console.log('home destroyed');
+  destroyed() { //销毁
+    console.log("home,destroyed");
   },
-  //点击切换页面首页不会乱
-  activated() {
+  activated() { //路由进来
+    // console.log(this.saveY + "进来")
     this.$refs.scroll.scrollTo(0, this.saveY, 0)
-    //刷新一下
     this.$refs.scroll.refresh()
   },
-  deactivated() {
+  deactivated() { //路由离开
+    // 1.保存Y值
     this.saveY = this.$refs.scroll.getScrollY()
-  },
-  created() {
-    // 1.请求多个数据
-    this.getHomeMultidata()
 
-    // 2.请求商品数据
+    // 2.取消全局事件的监听
+    this.$bus.$off('itemImgLoad',this.itemImgListener)
+    // console.log(this.saveY + "离开");
+  },
+  created() { //组件创建好就发送请求
+    //1.请求多个数据
+    this.getHomeMuleidata()
+
+    //2.请求商品数据
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
   },
-  mounted() {
-    // 1.图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh, 50)
-    this.$bus.$on('itemImageLoad', () => {
-      refresh()
-    })
-  },
+  mounted() {},
   methods: {
     /**
-     * 事件监听相关的方法
+     * s事件监听相关方法
      */
+    //选项切换事件
     tabClick(index) {
       switch (index) {
         case 0:
@@ -114,43 +113,51 @@ export default {
           break
         case 2:
           this.currentType = 'sell'
-          break
       }
-      this.$refs.tabControl1.currentIndex = index;
-      this.$refs.tabControl2.currentIndex = index;
+      //将显示切换类型固定 tabControl1/2 赋值给它们
+      //不能保证用户点击哪个，所有设置两个保持一致
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0)
-    },
+    //监听滚动位置
     contentScroll(position) {
-      // 1.判断BackTop是否显示
-      this.isShowBackTop = (-position.y) > 1000
+      //打印出来全是负数，所以取相反数
+      // 当y轴到底一定位置则变 true
+      //1.判断BackTop是否显示
+      this.listenShowBackTop(position)
 
-      // 2.决定tabControl是否吸顶(position: fixed)
+      //2.决定tabControl是否吸顶(position: fixed)
+      //保存变量，获取当前滚动位置是否大于this.tabOffsetTop
       this.isTabFixed = (-position.y) > this.tabOffsetTop
     },
+    //监听加载更多
     loadMore() {
+      //调用之前方法 每次调用+1 so直接调用
       this.getHomeGoods(this.currentType)
     },
+    //
     swiperImageLoad() {
-      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop //保存变量
     },
     /**
-     * 网络请求相关的方法
+     * 网络请求相关方法
      */
-    getHomeMultidata() {
-      getHomeMultidata().then(res => {
-        this.banners = res.data.banner.list;
-        this.recommends = res.data.recommend.list;
+    getHomeMuleidata() {
+      getHomeMuleidata().then(res => {
+        //this.result = res;
+        this.banners = res.data.banner.list
+        this.recommends = res.data.recommend.list
       })
     },
     getHomeGoods(type) {
+      //动态获取页码
       const page = this.goods[type].page + 1
       getHomeGoods(type, page).then(res => {
+        //特殊语法，将一个数组解析塞进另一个数组里面
         this.goods[type].list.push(...res.data.list)
         this.goods[type].page += 1
 
-        // 完成上拉加载更多
+        //完成上拉加载更多
         this.$refs.scroll.finishPullUp()
       })
     }
@@ -158,43 +165,45 @@ export default {
 }
 </script>
 
+<!--scoped 作用域 针对当前组件起效果-->
 <style scoped>
-#home {
-  /*padding-top: 44px;*/
-  height: 100vh;
-  position: relative;
-}
+  #home {
+    /*padding-top: 44px;*/
+    height: 100vh; /*vh -->viewport height*/
+    position: relative;
+  }
+  .home-nav {
+    background-color: var(--color-tint);
+    color:#fff;
 
-.home-nav {
-  background-color: var(--color-tint);
-  color: #fff;
+    /*使用浏览器原生滚动时,为了不让导航时使用*/
+    /*position: fixed;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    /*top: 0;*/
+    /*z-index: 9;*/
+  }
 
-  /*在使用浏览器原生滚动时, 为了让导航不跟随一起滚动*/
-  /*position: fixed;*/
-  /*left: 0;*/
-  /*right: 0;*/
-  /*top: 0;*/
-  /*z-index: 9;*/
-}
+  /*第二种方法*/
+  /*.content {*/
+  /*  !*overflow: hidden;*! !*bug 隐藏后无法滚动*!*/
 
-.content {
-  overflow: hidden;
+  /*  position: absolute;*/
+  /*  top: 44px;*/
+  /*  bottom: 49px;*/
+  /*  left: 0;*/
+  /*  right: 0;*/
+  /*}*/
+  /*第一种方法*/
+  .content {
+     height: calc(100% - 93px);
+     overflow: hidden;
+     /*margin-top: 44px;*/
+  }
 
-  position: absolute;
-  top: 44px;
-  bottom: 49px;
-  left: 0;
-  right: 0;
-}
-
-.tab-control {
-  position: relative;
-  z-index: 9;
-}
-
-/*.content {*/
-/*height: calc(100% - 93px);*/
-/*overflow: hidden;*/
-/*margin-top: 44px;*/
-/*}*/
+  /*没效果，可丢。。。*/
+  .tab-control {
+    position: relative;
+    z-index: 9;
+  }
 </style>

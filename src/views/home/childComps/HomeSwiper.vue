@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import {Swiper, SwiperItem} from 'components/common/swiper'
+ import {Swiper, SwiperItem} from '@/components/common/swper/index'
 
 export default {
   name: "HomeSwiper",
@@ -31,8 +31,8 @@ export default {
     SwiperItem
   },
   methods: {
-    //监听轮播图片是否加载完
     imageLoad() {
+      //只需要发送一次，记录状态
       if (!this.isLoad) {
         this.$emit('swiperImageLoad')
         this.isLoad = true

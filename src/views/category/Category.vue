@@ -1,26 +1,23 @@
 <template>
-  <div ref="aaaa" class="wrapper">
-
-
+  <div class="cart">
+    <NavBar class="nav-bar">
+      <div slot="center">购物车</div>
+    </NavBar>
   </div>
 </template>
 
 <script>
-import BScroll from 'better-scroll'
-
+import NavBar from "@/components/common/navbar/NavBar";
 export default {
   name: "Category",
-  data() {
-    return {}
-  },
-  // 组件创建完后调用
-  mounted() {
-
-  },
-  methods: {}
+  components: {
+    NavBar
+  }
 }
 </script>
 
 <style scoped>
-
+.nav-bar {
+  background-color: var(--color-tint);
+}
 </style>

@@ -1,10 +1,10 @@
 <template>
   <div class="goods-item" @click="itemClick">
-    <img :src="goodsItem.show.img" alt="" @load="imageLoad">
+    <img v-lazy="showImage" alt="" @load="imageLoad">
     <div class="goods-info">
-      <p>{{ goodsItem.title }}</p>
-      <span class="price">{{ goodsItem.price }}</span>
-      <span class="collect">{{ goodsItem.cfav }}</span>
+      <p>{{goodsItem.title}}</p>
+      <span class="price">¥{{goodsItem.price}}</span>
+      <span class="collect">{{goodsItem.cfav}}</span>
     </div>
   </div>
 </template>
@@ -20,13 +20,23 @@ export default {
       }
     }
   },
+  computed: { //计算属性
+     showImage() {
+       return this.goodsItem.image || this.goodsItem.show.img
+     }
+  },
   methods: {
     imageLoad() {
-      this.$bus.$emit('itemImageLoad')
+      this.$bus.$emit('itemImageLoad') //事件总线发送
+
+      // if (this.$route.path.indexOf('/home')) {
+      //   this.$bus.$emit('homeitemImageLoad')
+      // }else if (this.$route.path.indexOf('/detail')) {
+      //   this.$bus.$emit('detailitemImageLoad')
+      // }
     },
     itemClick() {
-      //路由跳转
-      this.$router.push('/detail/' + this.goodsItem.iid)
+      this.$router.push("/detail/" + this.goodsItem.iid)
     }
   }
 }
@@ -36,10 +46,8 @@ export default {
 .goods-item {
   padding-bottom: 40px;
   position: relative;
-
   width: 48%;
 }
-
 .goods-item img {
   width: 100%;
   border-radius: 5px;
@@ -57,7 +65,7 @@ export default {
 
 .goods-info p {
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis;/*文字超出显示..*/
   white-space: nowrap;
   margin-bottom: 3px;
 }
@@ -75,7 +83,7 @@ export default {
   content: '';
   position: absolute;
   left: -15px;
-  top: -1px;
+  top: 0;
   width: 14px;
   height: 14px;
   background: url("~assets/img/common/collect.svg") 0 0/14px 14px;

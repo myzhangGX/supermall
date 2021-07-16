@@ -1,11 +1,11 @@
 <template>
   <div class="tab-control">
-    <div v-for="(item, index) in titles"
-         :class="{active: index === currentIndex}"
-         class="tab-control-item"
-         @click="itemClick(index)">
-      <span>{{ item }}</span>
-    </div>
+     <div v-for="(item, index) in titles"
+          class="tab-control-item"
+          :class="{active: index === currentIndex}"
+          @click="itemClick(index)">
+        <span>{{item}}</span>
+     </div>
   </div>
 </template>
 
@@ -22,12 +22,13 @@ export default {
   },
   data() {
     return {
-      currentIndex: 0
+       currentIndex: 0
     }
   },
   methods: {
     itemClick(index) {
       this.currentIndex = index;
+      //往外传数据
       this.$emit('tabClick', index)
     }
   }
@@ -35,28 +36,30 @@ export default {
 </script>
 
 <style scoped>
-.tab-control {
-  display: flex;
-  text-align: center;
-  font-size: 15px;
-  height: 40px;
-  line-height: 40px;
-  background-color: #fff;
-}
+  .tab-control {
+    display: flex;
+    text-align: center;
+    font-size: 15px;
+    height: 40px;
+    line-height: 40px;
+    background-color: #fff;
+  }
 
-.tab-control-item {
-  flex: 1;
-}
+  .tab-control-item {
+    flex: 1;
+  }
 
-.tab-control-item span {
-  padding: 5px;
-}
+  .tab-control-item span {
+    padding: 5px;
+  }
 
-.active {
-  color: var(--color-high-text);
-}
+  .active {
+    color: var(--color-high-text);
+  }
 
-.active span {
-  border-bottom: 3px solid var(--color-tint);
-}
+  .active span {
+    border-bottom: 2px solid var(--color-high-text);
+  }
+
+
 </style>
